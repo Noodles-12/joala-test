@@ -1,11 +1,16 @@
 use eframe::egui;
 use egui_snarl::{Snarl, NodeId};
-use egui_snarl::ui::SnarlViewer;
+use egui_snarl::ui::{SnarlViewer, PinInfo};
+
+use core::hash::BuildHasherDefault;
 
 #[derive(Default)]
 struct MyApp {
     snarl: Snarl<String>,
 }
+
+#[derive(Hash, PartialEq, Eq, Default)]
+struct MyHasher{}
 
 struct MyViewer{}
 
@@ -24,11 +29,11 @@ impl SnarlViewer<String> for MyViewer {
         ui: &mut egui::Ui,
         snarl: &mut Snarl<String>,
     ) -> impl egui_snarl::ui::SnarlPin + 'static {
-        todo!()
+        PinInfo::circle().with_fill(egui::Color32::WHITE)
     }
 
     fn outputs(&mut self, node: &String) -> usize {
-        todo!()
+        1
     }
 
     fn show_output(
@@ -37,14 +42,24 @@ impl SnarlViewer<String> for MyViewer {
         ui: &mut egui::Ui,
         snarl: &mut Snarl<String>,
     ) -> impl egui_snarl::ui::SnarlPin + 'static {
-        todo!()
+         ui.label("in");
+        PinInfo::square()
     }
 }
 
 impl eframe::App for MyApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        egui::TopBottomPanel::top("Menu Bar").show(ctx, |ui| {
+            if ui.button("Add Node").clicked() {
+                self.snarl.insert_node(egui::pos2(0.0, 0.0), "Node".to_string());
+            }
+        });
         egui::CentralPanel::default().show(ctx, |ui| {
-            
+            self.snarl.show(
+                &mut MyViewer{}, 
+                &egui_snarl::ui::SnarlStyle::default(), 
+                MyHasher::default(),
+                ui);
         });
     }
 }
