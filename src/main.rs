@@ -1,6 +1,7 @@
 use eframe::egui;
+use egui::Vec2;
 use egui_snarl::{Snarl, NodeId};
-use egui_snarl::ui::{SnarlViewer, PinInfo};
+use egui_snarl::ui::{BackgroundPattern, Grid, PinInfo, SnarlViewer};
 
 use core::hash::BuildHasherDefault;
 
@@ -55,9 +56,11 @@ impl eframe::App for MyApp {
             }
         });
         egui::CentralPanel::default().show(ctx, |ui| {
+            let mut style = egui_snarl::ui::SnarlStyle::default();
+            style.bg_pattern = Some(BackgroundPattern::Grid(Grid{ spacing: Vec2{x: 20.0, y: 20.0}, angle: 0.0}));
             self.snarl.show(
                 &mut MyViewer{}, 
-                &egui_snarl::ui::SnarlStyle::default(), 
+                &style, 
                 MyHasher::default(),
                 ui);
         });
