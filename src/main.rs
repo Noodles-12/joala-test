@@ -55,14 +55,40 @@ impl eframe::App for MyApp {
                 self.snarl.insert_node(egui::pos2(0.0, 0.0), "Node".to_string());
             }
         });
+
         egui::CentralPanel::default().show(ctx, |ui| {
+            /*
+            let rect = ui.max_rect();
+            let response = ui.allocate_rect(rect, egui::Sense::click());
+            
+            if response.secondary_clicked() {
+                println!("Right click");
+                if let Some(pos) = response.interact_pointer_pos() {
+                    println!("Right click at: {:?}", pos);
+                }
+            }
+             */
+
+            let rect = ui.max_rect();
+            ui.set_min_size(rect.size());
+
+            if ctx.input(|i|{ i.pointer.secondary_clicked() }) {
+                if let Some(pos) = ctx.input(|i|{ i.pointer.interact_pos() }) {
+                    if rect.contains(pos) {
+                        println!("Right click at: {:?}", pos);
+                        self.snarl.insert_node(pos, "Node".to_string());
+                    }
+                }
+            }
+
             let mut style = egui_snarl::ui::SnarlStyle::default();
             style.bg_pattern = Some(BackgroundPattern::Grid(Grid{ spacing: Vec2{x: 20.0, y: 20.0}, angle: 0.0}));
             self.snarl.show(
                 &mut MyViewer{}, 
                 &style, 
                 MyHasher::default(),
-                ui);
+                ui
+            );
         });
     }
 }
